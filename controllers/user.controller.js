@@ -3,6 +3,7 @@ const otpModel = require("../models/otp.model");
 const { validationResult } = require("express-validator");
 const sendEmail = require("../utils/sendEmail");
 const signupOtpTemplate = require("../utils/emailTemplates/signupOtp");
+const blackListTokenModel = require("../models/blackListToken.model");
 
 // create and  send otp
 const sendOtp = async (req, res) => {
@@ -41,14 +42,21 @@ const registerUser = async (req, res) => {
 
   const { firstName, lastName, email, password, address, phoneNumber, otp } =
     req.body;
-  if (!otp) {
-    return res.status(401).json({
-      message: "Otp is required",
-    });
-  }
 
   try {
-    console.log("otp : ", otp);
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ message: "User with this email already exist" });
+    }
+
+    if (!otp) {
+      return res.status(401).json({
+        message: "Otp is required",
+      });
+    }
+
     const savedOtp = await otpModel.findOne({ email, otp });
     if (!savedOtp || savedOtp.otp !== otp) {
       return res.status(401).json({
@@ -78,7 +86,47 @@ const registerUser = async (req, res) => {
   }
 };
 
+// login user
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!(await user.comparePassword(password))) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    const token = await user.generateAuthToken();
+    res.cookie("token", token);
+
+    return res.status(200).json({ message: "User logged in successfully" });
+  } catch (error) {
+    console.log("Error while logging user in : ", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// user logout
+const logOutUser = async (req, res) => {
+  try {
+    const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+    res.clearCookie("token");
+
+    await blackListTokenModel.create({ token });
+
+    return res.status(200).json({ message: "User logged out successfully" });
+  } catch (error) {
+    console.log("Error while logging user out : ", error);
+  }
+};
+
 module.exports = {
   sendOtp,
   registerUser,
+  loginUser,
+  logOutUser,
 };

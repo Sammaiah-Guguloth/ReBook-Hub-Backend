@@ -66,7 +66,7 @@ userSchema.methods.generateAuthToken = function () {
 userSchema.statics.hashPassword = function (password) {
   return bcyrpt.hash(password, 10);
 };
-userSchema.statics.comparePassword = function (password) {
+userSchema.methods.comparePassword = function (password) {
   return bcyrpt.compare(password, this.password);
 };
 
