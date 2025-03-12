@@ -2,7 +2,7 @@
 
 ## Routes
 
-### POST /register
+### POST /user/register
 
 - **Description**: Registers a new user.
 - **Request Body**:
@@ -54,7 +54,7 @@
     }
     ```
 
-### POST /send-otp
+### POST /user/send-otp
 
 - **Description**: Sends an OTP to the user's email.
 - **Request Body**:
