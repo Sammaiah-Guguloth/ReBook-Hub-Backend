@@ -124,9 +124,20 @@ const logOutUser = async (req, res) => {
   }
 };
 
+// get user profile
+const getUserProfile = async (req, res) => {
+  req.user.password = undefined;
+
+  return res.status(200).json({
+    message: "User profile retrieved successfully",
+    user: req.user,
+  });
+};
+
 module.exports = {
   sendOtp,
   registerUser,
   loginUser,
   logOutUser,
+  getUserProfile,
 };

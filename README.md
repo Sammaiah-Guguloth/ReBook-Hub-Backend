@@ -11,8 +11,6 @@
     "email": "string" // User's email (required, must be a valid email format)
   }
   ```
-- **Comments**:
-  - If the email is missing: "Email is required".
 - **Status Codes**:
   - **200 OK**: OTP sent successfully.
   - **500 Internal Server Error**: Error sending OTP.
@@ -28,14 +26,12 @@
     "email": "string", // User's email (required, must be a valid email format)
     "password": "string", // User's password (required, minimum length of 6 characters)
     "address": {
-      // User's address details (required)
       "street": "string", // Street address (required)
       "village": "string", // Village or town (required)
       "city": "string", // City (required)
       "pincode": "string" // Pincode (required, must be exactly 6 digits)
     },
-    "phoneNumber": "string", // User's phone number (required, must be a valid 10-digit Indian mobile number)
-    "otp": "string" // otp sent to user's email (required)
+    "phoneNumber": "string" // User's phone number (required, must be a valid 10-digit Indian mobile number)
   }
   ```
 - **Status Codes**:
@@ -66,3 +62,11 @@
 - **Status Codes**:
   - **200 OK**: User logged out successfully.
   - **401 Unauthorized**: Unauthorized (if the token is invalid or missing).
+
+### GET /user/profile
+
+- **Description**: Retrieves the authenticated user's profile information.
+- **Request Body**: None
+- **Status Codes**:
+  - **200 OK**: User profile retrieved successfully.
+  - **401 Unauthorized**: Unauthorized (if the token is missing or invalid).
