@@ -6,27 +6,42 @@ const imagekit = new ImageKit({
   urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
 });
 
-const uploadToImageKit = async (
-  file,
-  fileName,
-  folder = "",
-  transformationOptions = null
-) => {
+const uploadToImageKit = async (file, fileName, folder = "") => {
   try {
-    if (!file || !fileName) {
-      throw new Error("File and fileName are required for upload.");
-    }
+    console.log("file : ", file);
+    console.log("filename : ", fileName);
 
-    const result = await imagekit.upload({
-      file,
+    // if (!file || !fileName) {
+    //   throw new Error("File and fileName are required for upload.");
+    // }
+
+    fileName = fileName ? fileName : "ReBookHub_image";
+
+    // Read the file buffer from express-fileupload's file object
+    const fileBuffer = file.data.toString("base64");
+
+    // Create the upload options
+    const uploadOptions = {
+      file: fileBuffer,
       fileName,
       folder,
-      if(transformationOptions) {
-        uploadOptions.transformation = [transformationOptions];
-      },
+    };
+
+    const result = await imagekit.upload(uploadOptions);
+
+    // Generate a transformed URL using ImageKit URL generation
+    const imageUrl = imagekit.url({
+      path: result.filePath,
+      transformation: [
+        { width: 800, cropMode: "maintain_ratio" },
+        { quality: 85 },
+        { format: "webp" },
+        { effectSharpen: true },
+        { effectContrast: true },
+      ],
     });
 
-    return result.url; // Returning the uploaded file URL
+    return imageUrl; // Returning the transformed image URL
   } catch (error) {
     console.error("Image upload failed:", error.message);
     throw new Error(error.message);

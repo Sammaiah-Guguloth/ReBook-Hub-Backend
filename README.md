@@ -70,3 +70,41 @@
 - **Status Codes**:
   - **200 OK**: User profile retrieved successfully.
   - **401 Unauthorized**: Unauthorized (if the token is missing or invalid).
+
+## Book Routes
+
+### POST /book/add
+
+- **Method**: `POST`
+- **Description**: This endpoint allows users to add a new book to the collection.
+
+### Request Body
+
+```json
+{
+  "title": "string (required)",
+  "genre": "string (required)",
+  "language": "string (required)",
+  "description": "string (required)",
+  "price": "number (required)",
+  "author": "string (required)",
+  "publication.date": "string (required)",
+  "publication.publisher": "string (required)",
+  "coverImage": "file (required) (jpeg, jpg, or png)",
+  "trueImages": "array of files (maximum 5, required) (jpeg, jpg, or png)"
+}
+```
+
+### Response
+
+- **Success**:
+  - Status Code: `201`
+  - Body:
+  ```json
+  {
+    "message": "Book added successfully",
+    "book": {
+      // Book details
+    }
+  }
+  ```
