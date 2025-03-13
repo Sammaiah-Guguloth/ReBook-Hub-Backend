@@ -1,6 +1,7 @@
 const bookModel = require("../models/book.model");
 const userModel = require("../models/user.model");
 const uploadToImageKit = require("../utils/uploadToImageKit");
+const deleteImageFromImageKit = require("../utils/deleteImageFromImageKit");
 
 // adding a book
 const addBook = async (req, res) => {
@@ -13,9 +14,6 @@ const addBook = async (req, res) => {
       date: req.body["publication.date"],
       publisher: req.body["publication.publisher"],
     };
-
-    console.log("title1 : ", title);
-    console.log("req.files : ", req.files);
 
     const coverImageFile = req.files.coverImage;
     let trueImagesFiles = req.files.trueImages || [];
@@ -48,19 +46,22 @@ const addBook = async (req, res) => {
     }
 
     console.log("title2 : ", title);
-    const coverImageUrl = await uploadToImageKit(
+    let coverImageUploadInfo = await uploadToImageKit(
       coverImageFile,
       title,
       "ReBookHub/CoverImages"
     );
     const trueImagesUrls = [];
     for (trueImage of trueImagesFiles) {
-      const trueImageUrl = await uploadToImageKit(
+      const trueImageUploadInfo = await uploadToImageKit(
         trueImage,
         trueImage.original,
         "ReBookHub/TrueImages"
       );
-      trueImagesUrls.push(trueImageUrl);
+      trueImagesUrls.push({
+        imageUrl: trueImageUploadInfo.imageUrl,
+        fileId: trueImageUploadInfo.fileId,
+      });
     }
 
     const newBook = await bookModel.create({
@@ -68,7 +69,10 @@ const addBook = async (req, res) => {
       genre,
       language,
       description,
-      coverImage: coverImageUrl,
+      coverImage: {
+        imageUrl: coverImageUploadInfo.imageUrl,
+        fileId: coverImageUploadInfo.fileId,
+      },
       trueImages: trueImagesUrls,
       price,
       author,
@@ -132,6 +136,10 @@ const deleteBookById = async (req, res) => {
 
     await bookModel.findByIdAndDelete(bookId);
     await userModel.findByIdAndUpdate(userId, { $pull: { myBooks: bookId } });
+    await deleteImageFromImageKit(book.coverImage.fileId);
+    for (trueImage of book.trueImages) {
+      await deleteImageFromImageKit(trueImage.fileId);
+    }
 
     res.status(200).json({ message: "Book deleted successfully" });
   } catch (error) {
@@ -140,9 +148,90 @@ const deleteBookById = async (req, res) => {
   }
 };
 
+// getting the books by genre
+const getBooksByGenre = async (req, res) => {
+  try {
+    const genre = req.params.genre;
+    const books = await bookModel
+      .find({ genre })
+      .populate("owner", "-password");
+    if (!books || books.length == 0) {
+      return res.status(404).json({
+        message: "No books found for the genre",
+      });
+    }
+    return res.status(200).json({
+      message: "Books found for the genre",
+      books,
+    });
+  } catch (error) {
+    console.log("Error while getting books by genre : ", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+// getting books by Author
+const getBooksByAuthor = async (req, res) => {
+  try {
+    const author = req.params.author;
+    const books = await bookModel.find({ author }).populate({
+      path: "owner",
+      select: "-password -coverImage.fileId",
+    });
+
+    if (!books || books.length == 0) {
+      return res.status(404).json({
+        message: "No books found for the author",
+      });
+    }
+    return res.status(200).json({
+      message: "Books found for the author",
+      books,
+    });
+  } catch (error) {
+    console.log("Error while getting books by author : ", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+//get books by title
+const getBooksByTitle = async (req, res) => {
+  try {
+    const title = req.params.title;
+    const books = await bookModel.find({ title }).populate({
+      path: "owner",
+      select: "-password -coverImage.fileId",
+    });
+    if (!books || books.length == 0) {
+      return res.status(404).json({
+        message: "No books found for the title",
+      });
+    }
+    return res.status(200).json({
+      message: "Books found for the title",
+      books,
+    });
+  } catch (error) {
+    console.log("Error while getting books by title : ", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addBook,
   getBookById,
   getAllBooks,
   deleteBookById,
+  getBooksByGenre,
+  getBooksByAuthor,
+  getBooksByTitle,
 };

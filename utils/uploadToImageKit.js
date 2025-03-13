@@ -8,9 +8,6 @@ const imagekit = new ImageKit({
 
 const uploadToImageKit = async (file, fileName, folder = "") => {
   try {
-    console.log("file : ", file);
-    console.log("filename : ", fileName);
-
     // if (!file || !fileName) {
     //   throw new Error("File and fileName are required for upload.");
     // }
@@ -41,7 +38,7 @@ const uploadToImageKit = async (file, fileName, folder = "") => {
       ],
     });
 
-    return imageUrl; // Returning the transformed image URL
+    return { imageUrl, fileId: result.fileId };
   } catch (error) {
     console.error("Image upload failed:", error.message);
     throw new Error(error.message);

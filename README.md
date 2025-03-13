@@ -1,6 +1,6 @@
 # API Documentation
 
-## User Routes
+## User API Endpoints
 
 ### POST /user/send-otp
 
@@ -67,9 +67,55 @@
 
 - **Description**: Retrieves the authenticated user's profile information.
 - **Request Body**: None
+- **Response Body**:
+  ```json
+  {
+    "firstName": "string",
+    "lastName": "string",
+    "email": "string",
+    "address": {
+      "street": "string",
+      "village": "string",
+      "city": "string",
+      "pincode": "string"
+    },
+    "phoneNumber": "string",
+    "booksBought": [], // array of book objects
+    "booksSold": [],
+    "myBooks": []
+  }
+  ```
 - **Status Codes**:
   - **200 OK**: User profile retrieved successfully.
   - **401 Unauthorized**: Unauthorized (if the token is missing or invalid).
+
+## Book API Endpoints
+
+### POST /book/add
+
+- **Description**: Adds a new book to the collection.
+- **Method**: POST
+- **Request Body**:
+  ```json
+  {
+    "title": "string",
+    "genre": "string",
+    "language": "string",
+    "description": "string",
+    "price": "number",
+    "author": "string",
+    "publication": {
+      "date": "string (dd-mm-yyyy)",
+      "publisher": "string"
+    },
+    "coverImage": "string",
+    "trueImages": ["string"]
+  }
+  ```
+- **Status Codes**:
+  - **201 Created**: Book added successfully.
+  - **400 Bad Request**: Validation errors (if any required fields are missing).
+  - **500 Internal Server Error**: An error occurred while adding the book.
 
 ### GET /all-books
 
@@ -132,5 +178,112 @@
       "rating": "number",
       "owner": "string"
     }
+  }
+  ```
+
+### DELETE /book/delete/:bookId
+
+- **Description**: Deletes a specific book from the collection by its ID.
+- **Parameters**:
+  - `bookId` (string): The ID of the book to be deleted.
+- **Authentication**:
+  - The user must be authenticated to perform this action.
+- **Response**:
+  - **Status Codes**:
+    - **200 OK**: Book deleted successfully.
+    - **401 Unauthorized**: User not authenticated.
+    - **404 Not Found**: Book not found or unauthorized.
+    - **500 Internal Server Error**: An error occurred on the server.
+
+### GET /books-by-genre/:genre
+
+- **Description**: Retrieves books by genre.
+- **Method**: GET
+- **Parameters**:
+  - `genre` (string): Genre to search.
+- **Response**:
+  - **Status Codes**:
+    - **200 OK**: Books retrieved successfully.
+    - **404 Not Found**: No books found.
+    - **500 Internal Server Error**: Server error occurred.
+  - **Response Body**:
+  ```json
+  {
+    "books": [
+      {
+        "title": "string",
+        "genre": "string",
+        "language": "string",
+        "description": "string",
+        "price": "number",
+        "author": "string",
+        "coverImage": "string",
+        "trueImages": ["string"],
+        "rating": "number",
+        "owner": "string"
+      }
+    ]
+  }
+  ```
+
+### GET /books-by-author/:author
+
+- **Description**: Retrieves books by author.
+- **Method**: GET
+- **Parameters**:
+  - `author` (string): Author's name.
+- **Response**:
+  - **Status Codes**:
+    - **200 OK**: Books retrieved successfully.
+    - **404 Not Found**: No books found.
+    - **500 Internal Server Error**: Server error occurred.
+  - **Response Body**:
+  ```json
+  {
+    "books": [
+      {
+        "title": "string",
+        "genre": "string",
+        "language": "string",
+        "description": "string",
+        "price": "number",
+        "author": "string",
+        "coverImage": "string",
+        "trueImages": ["string"],
+        "rating": "number",
+        "owner": "string"
+      }
+    ]
+  }
+  ```
+
+### GET /books-by-title/:title
+
+- **Description**: Retrieves books by title.
+- **Method**: GET
+- **Parameters**:
+  - `title` (string): Title to search.
+- **Response**:
+  - **Status Codes**:
+    - **200 OK**: Books retrieved successfully.
+    - **404 Not Found**: No books found.
+    - **500 Internal Server Error**: Server error occurred.
+  - **Response Body**:
+  ```json
+  {
+    "books": [
+      {
+        "title": "string",
+        "genre": "string",
+        "language": "string",
+        "description": "string",
+        "price": "number",
+        "author": "string",
+        "coverImage": "string",
+        "trueImages": ["string"],
+        "rating": "number",
+        "owner": "string"
+      }
+    ]
   }
   ```

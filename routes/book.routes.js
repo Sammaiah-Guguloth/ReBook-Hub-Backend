@@ -41,12 +41,15 @@ router.delete(
 // updating the book details
 
 // getting the books by genre
+router.get("/books-by-genre/:genre", bookController.getBooksByGenre);
 
 // getting the books by author
+router.get("/books-by-author/:author", bookController.getBooksByAuthor);
 
 // getting the books by price range
 
 // getting the books by title
+router.get("/books-by-title/:title", bookController.getBooksByTitle);
 
 // getting the books by rating
 

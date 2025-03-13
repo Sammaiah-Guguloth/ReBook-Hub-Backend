@@ -49,10 +49,15 @@ const bookSchema = new mongoose.Schema({
     required: true,
   },
   coverImage: {
-    type: String,
-    required: true,
+    imageUrl: { type: String, required: true },
+    fileId: { type: String, required: true },
   },
-  trueImages: [String],
+  trueImages: [
+    {
+      imageUrl: { type: String, required: true },
+      fileId: { type: String, required: true },
+    },
+  ],
   price: {
     type: Number,
     required: true,
