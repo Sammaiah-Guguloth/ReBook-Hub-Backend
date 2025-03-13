@@ -88,6 +88,61 @@ const addBook = async (req, res) => {
   }
 };
 
+// getting the book details by id
+const getBookById = async (req, res) => {
+  try {
+    const bookId = req.params.bookId;
+    const book = await bookModel.findById(bookId).populate("owner");
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+    return res.status(200).json({ message: "Book found", book });
+  } catch (error) {
+    console.log("Error while getting the book by id : ", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+//getting all books
+const getAllBooks = async (req, res) => {
+  try {
+    const books = await bookModel.find();
+    if (!books) {
+      return res.status(404).json({ message: "No books found" });
+    }
+    return res.status(200).json({ message: "Books found", books });
+  } catch (error) {
+    console.log("Error while getting all books : ", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+//deleting a book
+const deleteBookById = async (req, res) => {
+  try {
+    const bookId = req.params.bookId;
+    const userId = req.user._id;
+    const book = await bookModel.findOne({ _id: bookId, owner: userId });
+
+    if (!book) {
+      return res
+        .status(404)
+        .json({ message: "Book not found or unauthorized" });
+    }
+
+    await bookModel.findByIdAndDelete(bookId);
+    await userModel.findByIdAndUpdate(userId, { $pull: { myBooks: bookId } });
+
+    res.status(200).json({ message: "Book deleted successfully" });
+  } catch (error) {
+    console.log("Error while deleting the book by id : ", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   addBook,
+  getBookById,
+  getAllBooks,
+  deleteBookById,
 };

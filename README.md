@@ -71,40 +71,66 @@
   - **200 OK**: User profile retrieved successfully.
   - **401 Unauthorized**: Unauthorized (if the token is missing or invalid).
 
-## Book Routes
+### GET /all-books
 
-### POST /book/add
-
-- **Method**: `POST`
-- **Description**: This endpoint allows users to add a new book to the collection.
-
-  **Request Body**
-
-```json
-{
-  "title": "string (required)",
-  "genre": "string (required)",
-  "language": "string (required)",
-  "description": "string (required)",
-  "price": "number (required)",
-  "author": "string (required)",
-  "publication.date": "string (required)",
-  "publication.publisher": "string (required)",
-  "coverImage": "file (required) (jpeg, jpg, or png)",
-  "trueImages": "array of files (maximum 5, required) (jpeg, jpg, or png)"
-}
-```
-
-**Response**
-
-- **Success**:
-  - Status Code: `201`
-  - Body:
+- **Description**: Retrieves a list of all books available on the platform.
+- **Request Body**: None
+- **Response Body**:
   ```json
   {
-    "message": "Book added successfully",
+    "books": [
+      {
+        "title": "string", // The title of the book
+        "genre": "string", // The genre of the book
+        "language": "string", // The language in which the book is written
+        "description": "string", // A brief description of the book
+        "price": "number", // The price of the book
+        "author": "string", // The author of the book
+        "publication": {
+          "date": "string", // The publication date of the book
+          "publisher": "string" // The publisher of the book
+        },
+        "coverImage": "string", // URL of the book's cover image
+        "trueImages": ["string"], // Array of URLs of actual second-hand book images
+        "rating": "number", // The book's rating (if applicable)
+        "owner": "string" // The ID of the user who posted the book
+      }
+    ]
+  }
+  ```
+  **Status Codes**:
+  - **200 OK**: Books retrieved successfully.
+  - **500 Internal Server Error**: An error occurred on the server.
+
+### GET /book-by-id/:bookId
+
+- **Description**: Retrieves a specific book by its ID.
+- **Method**: GET
+- **Parameters**:
+  - `bookId` (string): The ID of the book to retrieve.
+- **Response**:
+  - **Status Codes**:
+    - **200 OK**: Book retrieved successfully.
+    - **404 Not Found**: Book not found.
+    - **500 Internal Server Error**: An error occurred on the server.
+  - **Response Body**:
+  ```json
+  {
     "book": {
-      // Book details
+      "title": "string",
+      "genre": "string",
+      "language": "string",
+      "description": "string",
+      "price": "number",
+      "author": "string",
+      "publication": {
+        "date": "string",
+        "publisher": "string"
+      },
+      "coverImage": "string",
+      "trueImages": ["string"],
+      "rating": "number",
+      "owner": "string"
     }
   }
   ```

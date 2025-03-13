@@ -25,11 +25,18 @@ router.post(
   bookController.addBook
 );
 
-//deleting a book
-
 // getting the book details
+router.get("/book-by-id/:bookId", bookController.getBookById);
 
 // getting all the books
+router.get("/all-books", bookController.getAllBooks);
+
+//deleting a book
+router.delete(
+  "/delete/:bookId",
+  authMiddleware.authUser,
+  bookController.deleteBookById
+);
 
 // updating the book details
 
