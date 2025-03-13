@@ -78,7 +78,7 @@
 - **Method**: `POST`
 - **Description**: This endpoint allows users to add a new book to the collection.
 
-### Request Body
+  **Request Body**
 
 ```json
 {
@@ -95,7 +95,7 @@
 }
 ```
 
-### Response
+**Response**
 
 - **Success**:
   - Status Code: `201`
