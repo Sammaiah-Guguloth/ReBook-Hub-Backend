@@ -8,9 +8,19 @@ const fileUpload = require("express-fileupload");
 
 const userRoutes = require("./routes/user.routes");
 const bookRoutes = require("./routes/book.routes");
+const analyticsRoutes = require("./routes/analytics.routes");
+const homeRoutes = require("./routes/home.routes");
+const paymentRoutes = require("./routes/payments.routes");
+const orderRoutes = require("./routes/orders.routes");
+const mockDeliveryRoutes = require("./routes/mockDelivery.routes");
+const webhooksRoutes = require("./routes/webhooks.routes");
 
 app.use(express.json());
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(fileUpload()); // To parse file uploads
 
@@ -18,6 +28,13 @@ connectToDb();
 
 app.use("/user", userRoutes);
 app.use("/book", bookRoutes);
+app.use("/analytics", analyticsRoutes);
+app.use("/home", homeRoutes);
+app.use("/payments", paymentRoutes);
+app.use("/orders", orderRoutes);
+app.use("/mock-delivery", mockDeliveryRoutes);
+app.use("/webhooks", webhooksRoutes);
+
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {

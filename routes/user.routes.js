@@ -9,7 +9,7 @@ router.post(
   [
     body("firstName")
       .exists({ checkFalsy: true })
-      .withMessage("Phone number is required")
+      .withMessage("FistName is required")
       .isLength({ min: 3 })
       .withMessage("First name must be atleast 3 characters long"),
     body("email")
@@ -22,12 +22,15 @@ router.post(
       .withMessage("Password is required")
       .isLength({ min: 6 })
       .withMessage("Password must be atleast 6 characters long"),
+    body("address.state")
+      .exists({ checkFalsy: true })
+      .withMessage("State is required"),
     body("address.street")
       .exists({ checkFalsy: true })
       .withMessage("Street is required"),
     body("address.village")
       .exists({ checkFalsy: true })
-      .withMessage("Town is required"),
+      .withMessage("Village is required"),
     body("address.city")
       .exists({ checkFalsy: true })
       .withMessage("City is required"),
@@ -35,9 +38,7 @@ router.post(
       .exists({ checkFalsy: true })
       .withMessage("Pincode is required")
       .isLength({ min: 6, max: 6 })
-      .withMessage("Pincode must be exactly 6 digits long")
-      .isNumeric()
-      .withMessage("Pincode must be a number"),
+      .withMessage("Pincode must be exactly 6 digits long"),
     body("phoneNumber")
       .exists({ checkFalsy: true })
       .withMessage("Phone number is required")
@@ -75,5 +76,7 @@ router.post(
 router.post("/logout", authMiddleware.authUser, userController.logOutUser);
 
 router.get("/profile", authMiddleware.authUser, userController.getUserProfile);
+
+router.put("/update", authMiddleware.authUser, userController.updateUser);
 
 module.exports = router;

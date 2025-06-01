@@ -1,5 +1,6 @@
 const bookModel = require("../models/book.model");
 const userModel = require("../models/user.model");
+const analyticsModel = require("../models/analytics.model");
 const uploadToImageKit = require("../utils/uploadToImageKit");
 const deleteImageFromImageKit = require("../utils/deleteImageFromImageKit");
 
@@ -10,10 +11,12 @@ const addBook = async (req, res) => {
       req.body;
 
     console.log("req.body : ", req.body);
-    const publication = {
-      date: req.body["publication.date"],
-      publisher: req.body["publication.publisher"],
-    };
+    // const publication = {
+    //   date: req.body["publication.date"],
+    //   publisher: req.body["publication.publisher"],
+    // };
+
+    const publication = JSON.parse(req.body.publication);
 
     const coverImageFile = req.files.coverImage;
     let trueImagesFiles = req.files.trueImages || [];
@@ -85,6 +88,12 @@ const addBook = async (req, res) => {
     user.myBooks.push(newBook._id);
     await user.save();
 
+    // creating a analytics model for the book
+    const analytics = await new analyticsModel.create({
+      bookId: newBook._id,
+      genre: genre,
+    });
+
     res.status(201).json({ message: "Book added successfully", book: newBook });
   } catch (error) {
     console.log("Error while adding the book : ", error);
@@ -96,6 +105,7 @@ const addBook = async (req, res) => {
 const getBookById = async (req, res) => {
   try {
     const bookId = req.params.bookId;
+    console.log("bookId ", bookId);
     const book = await bookModel.findById(bookId).populate("owner");
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
@@ -104,6 +114,27 @@ const getBookById = async (req, res) => {
   } catch (error) {
     console.log("Error while getting the book by id : ", error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+//getting the my books of user
+const getMyBooks = async (req, res) => {
+  try {
+    // console.log("user : ", req.user);
+
+    const books = await userModel
+      .findById(req.user._id)
+      .select("myBooks")
+      .populate("myBooks");
+
+    // console.log("books : ", books);
+
+    return res
+      .status(200)
+      .json({ message: "My books found", books: books.myBooks });
+  } catch (error) {
+    console.log("Error while getting my books of user : ", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -226,6 +257,34 @@ const getBooksByTitle = async (req, res) => {
   }
 };
 
+// searching books by query
+const searchBooks = async (req, res) => {
+  const { query } = req.query;
+
+  if (!query || query.trim() === "") {
+    return res.status(400).json({ error: "Query is required" });
+  }
+
+  try {
+    const regex = new RegExp(query.trim(), "i"); // Case-insensitive partial match
+
+    const books = await bookModel.find({
+      $or: [
+        { title: { $regex: regex } },
+        { author: { $regex: regex } },
+        { description: { $regex: regex } },
+        { language: { $regex: regex } },
+        { genre: { $regex: regex } },
+      ],
+    });
+
+    res.status(200).json(books);
+  } catch (error) {
+    console.error("Search Error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 module.exports = {
   addBook,
   getBookById,
@@ -234,4 +293,6 @@ module.exports = {
   getBooksByGenre,
   getBooksByAuthor,
   getBooksByTitle,
+  getMyBooks,
+  searchBooks,
 };

@@ -84,6 +84,10 @@ const bookSchema = new mongoose.Schema({
     ref: "user",
     required: true,
   },
+  isAvailable: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const bookModel = mongoose.model("book", bookSchema);

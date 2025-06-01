@@ -93,7 +93,7 @@ const loginUser = async (req, res) => {
   try {
     const user = await userModel.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(401).json({ message: "User not found" });
     }
 
     if (!(await user.comparePassword(password))) {
@@ -101,9 +101,17 @@ const loginUser = async (req, res) => {
     }
 
     const token = await user.generateAuthToken();
-    res.cookie("token", token);
+    res.cookie("token", token, {
+      httpOnly: true, // Makes the cookie inaccessible to JavaScript (for security).
+      // secure: true,          // Ensures cookie is sent over HTTPS only (Enable only in production).
+      sameSite: "lax", // Protects against CSRF attacks (use 'strict' or 'lax').
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week (Specify cookie expiration time in milliseconds).
+    });
 
-    return res.status(200).json({ message: "User logged in successfully" });
+    return res.status(200).json({
+      user: user,
+      message: "User logged in successfully",
+    });
   } catch (error) {
     console.log("Error while logging user in : ", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -134,10 +142,57 @@ const getUserProfile = async (req, res) => {
   });
 };
 
+// Helper to flatten nested objects like { address: { city: "New" } } into { "address.city": "New" }
+function flattenObject(obj, prefix = "", res = {}) {
+  for (const key in obj) {
+    const value = obj[key];
+    const newKey = prefix ? `${prefix}.${key}` : key;
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      flattenObject(value, newKey, res);
+    } else {
+      res[newKey] = value;
+    }
+  }
+  return res;
+}
+
+const updateUser = async (req, res) => {
+  const userId = req.user._id;
+  const updates = req.body;
+
+  try {
+    if (!updates || Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: "No fields to update" });
+    }
+
+    // Flatten the updates object to allow partial nested updates
+    const flatUpdates = flattenObject(updates);
+
+    const updatedUser = await userModel.findByIdAndUpdate(
+      userId,
+      { $set: flatUpdates },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Updated successfully",
+      updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   sendOtp,
   registerUser,
   loginUser,
   logOutUser,
   getUserProfile,
+  updateUser,
 };

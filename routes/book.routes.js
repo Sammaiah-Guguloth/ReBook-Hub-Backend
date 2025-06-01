@@ -28,6 +28,9 @@ router.post(
 // getting the book details
 router.get("/book-by-id/:bookId", bookController.getBookById);
 
+// getting all the books of the user
+router.get("/my-books", authMiddleware.authUser, bookController.getMyBooks);
+
 // getting all the books
 router.get("/all-books", bookController.getAllBooks);
 
@@ -50,6 +53,9 @@ router.get("/books-by-author/:author", bookController.getBooksByAuthor);
 
 // getting the books by title
 router.get("/books-by-title/:title", bookController.getBooksByTitle);
+
+// getting the books by search query
+router.get("/search", bookController.searchBooks);
 
 // getting the books by rating
 
