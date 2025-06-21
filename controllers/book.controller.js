@@ -10,7 +10,7 @@ const addBook = async (req, res) => {
     const { title, genre, language, description, price, author, rating } =
       req.body;
 
-    console.log("req.body : ", req.body);
+    // console.log("req.body : ", req.body);
     // const publication = {
     //   date: req.body["publication.date"],
     //   publisher: req.body["publication.publisher"],
@@ -48,7 +48,7 @@ const addBook = async (req, res) => {
       }
     }
 
-    console.log("title2 : ", title);
+    // console.log("title2 : ", title);
     let coverImageUploadInfo = await uploadToImageKit(
       coverImageFile,
       title,
@@ -89,7 +89,7 @@ const addBook = async (req, res) => {
     await user.save();
 
     // creating a analytics model for the book
-    const analytics = await new analyticsModel.create({
+    const analytics = await analyticsModel.create({
       bookId: newBook._id,
       genre: genre,
     });
@@ -105,7 +105,7 @@ const addBook = async (req, res) => {
 const getBookById = async (req, res) => {
   try {
     const bookId = req.params.bookId;
-    console.log("bookId ", bookId);
+    // console.log("bookId ", bookId);
     const book = await bookModel.findById(bookId).populate("owner");
     if (!book) {
       return res.status(404).json({ message: "Book not found" });

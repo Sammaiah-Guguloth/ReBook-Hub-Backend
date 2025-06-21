@@ -10,6 +10,7 @@ const bookSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: [
+      "Fiction",
       "Romance",
       "Thriller",
       "Science Fiction",

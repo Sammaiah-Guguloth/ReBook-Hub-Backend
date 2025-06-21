@@ -15,9 +15,11 @@ const orderRoutes = require("./routes/orders.routes");
 const mockDeliveryRoutes = require("./routes/mockDelivery.routes");
 const webhooksRoutes = require("./routes/webhooks.routes");
 
+const port = process.env.PORT || 3000;
+
 app.use(express.json());
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: process.env.FRONTEND_BASE_URL,
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -43,4 +45,6 @@ app.get("/", (req, res) => {
   );
 });
 
-module.exports = app;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});

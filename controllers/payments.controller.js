@@ -102,9 +102,9 @@ const verifyPayment = async (req, res) => {
       const buyer = await userModel.findById(order.buyerId);
       const book = await bookModel.findById(order.bookId);
 
-      //  // mark the book isAvailability as false
-      //  book.isAvailable = false;
-      //  await book.save();
+      // mark the book isAvailability as false
+      book.isAvailable = false;
+      await book.save();
 
       const sellerMessage = `You have received a new order from ${buyer.name}. Order details: ${order._id}`;
       const buyerMessage = `You order has been placed and payment was successfull`;

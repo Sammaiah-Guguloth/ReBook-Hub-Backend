@@ -158,6 +158,8 @@ const rejectAndRefund = async (req, res) => {
       .populate("buyerId", "name email")
       .populate("sellerId", "name email");
 
+    // console.log(order);
+
     if (!order) return res.status(404).json({ message: "Order not found" });
 
     if (order.status !== "pending_seller_confirmation") {
@@ -175,6 +177,8 @@ const rejectAndRefund = async (req, res) => {
     const { name: buyerName, email: buyerEmail } = order.buyerId;
     const { name: sellerName, email: sellerEmail } = order.sellerId;
 
+    // console.log("chame here");
+
     // 4. Attempt refund via Razorpay
     const refund = await razorpayInstance.payments.refund(
       order.razorpayPaymentId
@@ -184,11 +188,11 @@ const rejectAndRefund = async (req, res) => {
     order.status = "refunded";
     await order.save();
 
-    // const book = await bookModel.findById(order.bookId);
+    const book = await bookModel.findById(order.bookId);
 
-    // book.isAvailable = true;
+    book.isAvailable = true;
 
-    // await book.save();
+    await book.save();
 
     // 6. Notify buyer
     await sendEmail({
