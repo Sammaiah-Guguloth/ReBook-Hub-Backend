@@ -102,9 +102,9 @@ const loginUser = async (req, res) => {
 
     const token = await user.generateAuthToken();
     res.cookie("token", token, {
-      httpOnly: true, // Makes the cookie inaccessible to JavaScript (for security).
-      // secure: true,          // Ensures cookie is sent over HTTPS only (Enable only in production).
-      sameSite: "lax", // Protects against CSRF attacks (use 'strict' or 'lax').
+      httpOnly: true,
+      secure: true, // Ensures cookie is sent over HTTPS only (Enable only in production).
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week (Specify cookie expiration time in milliseconds).
     });
 
