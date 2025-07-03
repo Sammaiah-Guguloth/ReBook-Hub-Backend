@@ -18,10 +18,30 @@ const webhooksRoutes = require("./routes/webhooks.routes");
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+// const corsOptions = {
+//   origin: process.env.FRONTEND_BASE_URL,
+//   credentials: true,
+// };
+
+const allowedOrigins = [
+  process.env.FRONTEND_BASE_URL,
+  "http://localhost:5173", // Example for local testing
+  "https://rebookhub-server.onrender.com",
+  "https://686647556d4f6bb9af01ce2a--rebookhub1.netlify.app",
+];
+
 const corsOptions = {
-  origin: process.env.FRONTEND_BASE_URL,
+  origin: (origin, callback) => {
+    // Allow requests with no origin like mobile apps or curl requests
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 };
+
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(fileUpload()); // To parse file uploads
