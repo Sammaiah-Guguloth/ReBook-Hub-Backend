@@ -27,6 +27,7 @@ const allowedOrigins = [
   process.env.FRONTEND_BASE_URL,
   "http://localhost:5173", // Example for local testing
   "https://rebookhub-server.onrender.com",
+  "https://rebookhub1.netlify.app/about",
   "https://686647556d4f6bb9af01ce2a--rebookhub1.netlify.app",
 ];
 
